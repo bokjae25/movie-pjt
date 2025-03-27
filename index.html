@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>영화 목록</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background-color: #141414;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      font-size: 36px;
+      margin-top: 20px;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .movie-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      padding: 20px;
+      margin-top: 30px;
+      width: 100%;
+      overflow-x: scroll;
+      padding-bottom: 50px;
+    }
+
+    .movie-card {
+      background-color: #222;
+      border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);
+      width: 200px;
+      height: 350px;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .movie-card:hover {
+      transform: scale(1.1);
+      box-shadow: 0 20px 30px rgba(0, 0, 0, 0.9);
+    }
+
+    .movie-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .movie-info {
+      padding: 15px;
+      text-align: center;
+    }
+
+    .movie-info .title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      max-width: 100%;
+    }
+
+    .movie-info .vote {
+      font-size: 14px;
+      color: #ddd;
+    }
+
+    /* 스크롤바 스타일링 */
+    .movie-list::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .movie-list::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 10px;
+    }
+
+    .movie-list::-webkit-scrollbar-track {
+      background: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>영화 목록</h1>
+  <div class="movie-list" id="movieList">
+    <!-- 영화 카드들이 여기에 동적으로 추가됩니다 -->
+  </div>
+
+  <script>
+    // API로부터 영화 데이터를 가져와서 표시하는 함수
+    async function fetchMovies() {
+      try {
+        const response = await fetch('http://localhost:3000/movies');
+        const movies = await response.json();
+
+        const movieListContainer = document.getElementById('movieList');
+
+        // 영화 목록을 동적으로 HTML에 추가
+        movies.forEach(movie => {
+          const movieCard = document.createElement('div');
+          movieCard.classList.add('movie-card');
+
+          // 템플릿 리터럴을 사용하여 문자열을 생성합니다.
+          const moviePoster = movie.Poster_Path 
+            ? `<img src="${movie.Poster_Path}" alt="${movie.Title}" onclick="window.location.href='movie-detail.html?id=${movie.ID}'">`
+            : '<img src="https://via.placeholder.com/200x300" alt="No Image Available">';
+          
+          const movieTitle = `<div class="title">${movie.Title}</div>`;
+          const movieVote = `<div class="vote">평점: ${movie.Vote_Average}</div>`;
+
+          const movieInfo = `<div class="movie-info">${movieTitle}${movieVote}</div>`;
+          movieCard.innerHTML = moviePoster + movieInfo;
+
+          movieListContainer.appendChild(movieCard);
+        });
+      } catch (error) {
+        console.error('영화 데이터를 가져오는 중 오류 발생:', error);
+      }
+    }
+
+    // 페이지가 로드되면 영화 데이터를 가져옵니다.
+    window.onload = fetchMovies;
+  </script>
+</body>
+</html>

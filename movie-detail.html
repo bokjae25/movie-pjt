@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>영화 상세 페이지</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background-color: #141414;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      font-size: 36px;
+      margin-top: 20px;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .movie-detail {
+      width: 80%;
+      max-width: 1000px;
+      background-color: #222;
+      border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .movie-detail img {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .movie-detail .title {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .movie-detail .vote {
+      font-size: 18px;
+      color: #ddd;
+      margin-bottom: 20px;
+    }
+
+    .movie-detail .overview {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #bbb;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .back-button {
+      padding: 10px 20px;
+      background-color: #333;
+      color: #fff;
+      font-size: 16px;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-top: 20px;
+      transition: background-color 0.3s ease;
+    }
+
+    .back-button:hover {
+      background-color: #555;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>영화 상세 페이지</h1>
+  
+  <div class="movie-detail" id="movieDetail">
+    <!-- 영화 상세 정보가 여기에 동적으로 추가됩니다 -->
+  </div>
+
+  <a href="index.html" class="back-button">목록으로 돌아가기</a>
+
+  <script>
+    // 영화 ID를 URL 파라미터로 받아와서 상세 정보를 가져오는 함수
+    async function fetchMovieDetail() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const movieId = urlParams.get('id');  // URL에서 ID를 가져옴
+
+      if (!movieId) {
+        alert('잘못된 접근입니다.');
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:3000/movies/${movieId}`);
+        const movie = await response.json();
+
+        const movieDetailContainer = document.getElementById('movieDetail');
+
+        const moviePoster = movie.Poster_Path 
+          ? `<img src="${movie.Poster_Path}" alt="${movie.Title}">`
+          : '<img src="https://via.placeholder.com/400x600" alt="No Image Available">';
+
+        const movieTitle = `<div class="title">${movie.Title}</div>`;
+        const movieVote = `<div class="vote">평점: ${movie.Vote_Average}</div>`;
+        const movieOverview = `<div class="overview">${movie.Overview || '상세 내용이 없습니다.'}</div>`;
+
+        movieDetailContainer.innerHTML = moviePoster + movieTitle + movieVote + movieOverview;
+      } catch (error) {
+        console.error('영화 상세 정보를 가져오는 중 오류 발생:', error);
+        alert('영화 정보를 가져오는 데 오류가 발생했습니다.');
+      }
+    }
+
+    // 페이지가 로드되면 영화 상세 정보를 가져
